@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en" ng-app="bugsApp">
+<head>
+	<meta charset="UTF-8">
+	<title>RestBugs - Static</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.4/angular.min.js"></script>
+</head>
+<body>
+	<h1>RestBugs, the static version</h1>
+
+	<div>
+		<h2>Backlog</h2>
+		<ul ng-controller="backlogController">
+			<li ng-repeat="bug in backlog.bugs">
+				<div>{{ bug.title }}</div>
+			</li>
+		</ul>
+	</div>
+	
+	<script>
+		var app = angular.module('bugsApp', []);	// empty array means no module dependencies
+
+		app.controller('backlogController', function($scope, $http){
+			$http.get('/resources/backlog.json').then(function(res){
+				$scope.backlog = res.data;
+			})
+		});
+
+		app.controller('workingController', function($scope, $http){
+			$http.get('/resources/working.json').then(function(res){
+				$scope.working = res.data;
+			})
+		});
+	</script>
+</body>
+</html>

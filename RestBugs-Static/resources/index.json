@@ -1,0 +1,51 @@
+{
+    "bugs" : [],
+    "forms" : [
+        {
+            "id" : "new backlog",
+            "href" : "/bugs/backlog",
+            "method" : "POST",
+            "inputs" : [
+                {
+                    "name" : "title",
+                    "type" : "text"
+                },
+                {
+                    "name" : "description",
+                    "type" : "text"
+                }
+            ]
+        }
+    ],
+    "links" : [
+        { 
+            "href" : "http://restbugs.com/profile/restbugs+json", 
+            "rel" : "profile"
+        },
+        { 
+            "href" : "/index.json", 
+            "id" : "index", 
+            "rel" : "navigation"
+        },
+        { 
+            "href" : "/backlog.json", 
+            "id" : "backlog", 
+            "rel" : "navigation"
+        },
+        { 
+            "href" : "/working.json", 
+            "id" : "working", 
+            "rel" : "navigation" 
+        },
+        { 
+            "href" : "/qa.json", 
+            "id": "qa", 
+            "rel" : "navigation" 
+        },
+        { 
+            "href" : "/done.json", 
+            "id": "done", 
+            "rel" : "navigation" 
+        }
+    ]
+}

@@ -1,0 +1,230 @@
+#!/usr/bin/env node
+
+var program = require('commander'),
+	http = require('http'),
+	url = require('url'),
+	util = require('util'),
+	async = require('async'),
+	readline = require('readline'),
+	_ = require('underscore'),
+	assert = require('assert');
+
+
+program
+.version('0.0.1')
+.option('-s, --service <host>', 'Path to the remote service host.')
+.option('-b, --bookmark <resource>', 'Relative path to initial bookmark resource.')
+.parse(process.argv);
+
+var service = program.service || 'http://localhost:8000';
+var initialBookmark = program.bookmark || '/index.json';
+
+var rl = readline.createInterface({
+	input: process.stdin,
+	output: process.stdout
+});
+
+var getResource = function(url, callback){
+	http.get(url, function(res){
+		// console.info(util.format('Fetched resource %s with status code $s', url, res.statusCode));
+		var responseBuffer = '';
+		res.setEncoding('utf8');
+		res.on('data', function(chunk){
+			responseBuffer += chunk;
+		});
+		res.on('end', function(){
+			// console.info(util.format('Finished reading resource %s\n%s', url, responseBuffer))
+			callback(null, responseBuffer);
+		});
+	})
+	.on('error', function(err){
+		console.error(util.format('Error fetching %s: %s', url, err));
+		callback(err, null);
+	});
+};
+
+var postResource = function(url, data, callback){
+	var options = {
+		method: 'POST'	
+	};
+	console.info('POSTING COMMAND - to ' + url);
+	console.info(util.inspect(data, { colors : true }));
+	callback(null, null);
+}
+
+var getJsonResource = function(url, callback){
+	getResource(url, function(err, data){
+		if(err) return callback(err, null);
+		callback(null, JSON.parse(data));
+	});
+};
+
+var isNavigationLink = function(link){
+	return link.rel === 'navigation';
+};
+
+var displayNavigation = function(links){
+	console.info('\nAvailable Links');
+	console.info('===============')
+	console.info('Enter \'link [resource]\' to navigate\n');
+
+	_.each(_.filter(links, isNavigationLink), function(link){
+		console.info(link.id);
+	});
+};
+
+var negate = function(predicate){
+	return function(){
+		return !predicate.apply(null, arguments);
+	};
+};
+
+var isHidden = function(input){
+	return input.type && input.type === 'hidden';
+};
+
+var commandText = function(form){
+	var commandParts = [form.id];
+	_.each(_.filter(form.inputs, negate(isHidden)), function(input){
+		commandParts.push(util.format('<%s>', input.name));
+	})
+
+	return commandParts.join(' ');
+};
+
+var commandsText = function(forms){
+	var commandLabels = [];
+	_.each(forms, function(form){
+		commandLabels.push(commandText(form));
+	});
+
+	return commandLabels.join(', ');
+};
+
+var narrowTo = function(length, str){
+	if(str.length <= length)
+		return str;
+	return str.slice(0, length - 4) + '...';
+};
+
+var displayBugs = function(bugs){
+	console.info('\nAvailable Bugs');
+	console.info('==============');
+	console.info('To run one of the available commands for an item, enter [command name] [item number] <additional params>\n');
+
+	if(bugs.length > 0){
+        _.each(bugs, function(bug, index){
+        	console.info('ID: ' + index);
+        	console.info('Title: ' + bug.title);
+        	console.info('Description: ' + bug.description);
+        	console.info('Available Commands: ' + commandsText(bug.forms));
+        	console.info('');
+        })
+	} else {
+		console.info('(There are no bugs to display)');
+	}
+};
+
+var displayDataCommands = function(forms){
+	console.info('\nCommands');
+	console.info('========');
+	console.info(commandsText(forms));
+};
+
+
+var displayResourceUX = function(data){
+
+	console.info('\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++');	
+
+	displayDataCommands(data.forms);
+	displayNavigation(data.links);
+	displayBugs(data.bugs);
+
+	console.info('');
+};
+
+var linkResourceCommand = function(url){
+	return function(callback){
+		getJsonResource(url, callback);
+	};
+};
+
+var hasID = function(id){
+	return function(o){
+		return _.has(o, 'id') && o.id === id;
+	};
+};
+
+var moveFormCommand = function(href, hiddenInputs, comments){
+	return function(callback){
+		postResource(href, {}, callback);
+	};
+};
+
+var resourceCommand = function(cmdString, data){
+	var cmdParts = cmdString.split(' ');
+	var command = cmdParts[0];
+	switch(command){
+		case 'link':
+			var link = _.find(data.links, hasID(cmdParts[1]));
+			return linkResourceCommand(fullUrl(link.href));
+		case 'move-working':  // the way that commands are interpreted is not ideal as it's not generic - come back to this
+		case 'move-qa':
+		case 'move-done':
+		case 'move-backlog':
+			var itemNumber = cmdParts[1],
+				comments = cmdParts[2];
+			// get the form from the data
+			var form = _.find(data.bugs[itemNumber].forms, function(form){ return form.id === command});
+			console.info(util.inspect(form));
+			return moveFormCommand(fullUrl(form.href), _.filter(form.inputs, isHidden), comments);	// longer term, comments shouldn't be passed in directly, but rather as the array of all arguments
+	};
+};
+
+var fullUrl = function(path){
+	// todo: this can be dramatically hardened for things like 
+	// a) see if the input is already a full URL
+	// b) verify leading slash
+	var u = url.parse(path);
+	assert(u, util.format('%s could not be parsed as a URL', path));
+
+	if(!u.host)
+		return service + path;
+	else
+		return path;
+};
+
+var commandLoop = function(cmd, callback){
+	var command = cmd;
+	async.doUntil(
+		function(callback){
+			command(function(err, data){
+				if(err) return callback(err, null);
+
+				displayResourceUX(data);
+
+				rl.question('Command: ', function(cmd){
+					if(cmd === 'q')
+						command = null;
+					else
+						command = resourceCommand(cmd, data);
+					callback(null);
+				});
+			});
+		}, 
+		function(){
+			return command === null;
+		}, callback);
+};
+
+// BOOTSTRAP /////////////////////////////////////////////////////////////////////////////////
+
+console.info("Welcome to RESTBugs \"on command\"!\n");
+console.info("Enter a command per the instructions below, or enter 'q' to quit.");
+
+commandLoop(linkResourceCommand(fullUrl(initialBookmark)), function(err){
+	console.info('All Done!');
+});
+
+
+

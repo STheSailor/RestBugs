@@ -1,0 +1,60 @@
+<html>
+	<head>
+		<title>Working</title>
+	</head>
+    <body>
+        <h1></h1>
+        <div id="bugs">
+
+
+                <ul class="all">
+
+
+                        <li>
+                            Title: <span class="title">new bug</span>
+                            Description: <span class="description">it&#39;s a bug...for reals</span>
+                            Assigned To: <span class="assigned-to">undefined</span>
+
+
+
+
+
+
+                            <form class="move backlog" action="/bugs/backlog" method="POST" title="Move to Backlog" >
+                                <input name="id" type="hidden" value="53344e4c5a1afe1e387eb179"/>
+                                <input name="comments" type="text" value=""/>
+                                <input name="submit" type="submit" value="Move to Backlog"/>
+                            </form>
+                            <form class="move qa next" action="/bugs/qa" method="POST" title="Move to QA" >
+                                <input name="id" type="hidden" value="53344e4c5a1afe1e387eb179"/>
+                                <input name="comments" type="text" value=""/>
+                                <input name="submit" type="submit" value="Move to QA"/>
+                            </form>
+
+
+
+
+
+
+                        </li>
+
+
+                </ul>
+
+
+        </div>
+        <div id="forms">
+
+
+        </div>
+
+        <div id="links">
+            <h2>Navigation</h2>
+            <a href="/bugs" rel="index">Index</a><br/>
+            <a href="/bugs/backlog" rel="backlog">Backlog</a><br/>
+            <a href="/bugs/working" rel="working">Working</a><br/>
+            <a href="/bugs/qa" rel="qa">In QA</a><br/>
+            <a href="/bugs/done" rel="done">Done</a>
+        </div>
+    </body>
+</html>

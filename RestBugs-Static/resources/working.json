@@ -1,0 +1,91 @@
+{
+    "bugs" : [
+        {
+            "title" : "new bug",
+            "description" : "it's a bug...for reals",
+            "assignedTo" : "undefined",
+            "forms" : [
+                {
+                    "id" : "move-backlog",
+                    "href" : "/bugs/backlog",
+                    "method" : "POST",
+                    "inputs" : [
+                        {
+                            "name" : "id",
+                            "type" : "hidden",
+                            "value" : "53344e4c5a1afe1e387eb179"
+                        },
+                        {
+                            "name" : "comments",
+                            "type" : "text"
+                        }
+                    ]
+                },
+                {
+                    "id" : "move-qa",
+                    "href" : "/bugs/qa",
+                    "method" : "POST",
+                    "inputs" : [
+                        {
+                            "name" : "id",
+                            "type" : "hidden",
+                            "value" : "53344e4c5a1afe1e387eb179"
+                        },
+                        {
+                            "name" : "comments",
+                            "type" : "text"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "forms" : [
+        {
+            "id" : "new-backlog",
+            "href" : "/bugs/backlog",
+            "method" : "POST",
+            "inputs" : [
+                {
+                    "name" : "title",
+                    "type" : "text"
+                },
+                {
+                    "name" : "description",
+                    "type" : "text"
+                }
+            ]
+        }
+    ],
+    "links" : [
+        { 
+            "href" : "http://restbugs.com/profile/restbugs+json", 
+            "rel" : "profile"
+        },
+        { 
+            "href" : "/index.json", 
+            "id" : "index", 
+            "rel" : "navigation"
+        },
+        { 
+            "href" : "/backlog.json", 
+            "id" : "backlog", 
+            "rel" : "navigation"
+        },
+        { 
+            "href" : "/working.json", 
+            "id" : "working", 
+            "rel" : "navigation" 
+        },
+        { 
+            "href" : "/qa.json", 
+            "id": "qa", 
+            "rel" : "navigation" 
+        },
+        { 
+            "href" : "/done.json", 
+            "id": "done", 
+            "rel" : "navigation" 
+        }
+    ]
+}

@@ -1,0 +1,33 @@
+<html>
+	<head>
+		<title>Bugs API root</title>
+	</head>
+    <body>
+        <h1></h1>
+        <div id="bugs">
+
+        </div>
+        <div id="forms">
+
+
+
+            <h2>Add a new bug!</h2>
+            <form class="new backlog" action="/bugs/backlog" method="POST" title="Add a new bug" >
+                Title: <input name="title" type="text" value=""/>
+                Description: <input name="description" type="text" value=""/>
+                <input name="submit" type="submit" value="Add to Backlog"/>
+            </form>
+
+
+        </div>
+
+        <div id="links">
+            <h2>Navigation</h2>
+            <a href="/bugs" rel="index">Index</a><br/>
+            <a href="/bugs/backlog" rel="backlog">Backlog</a><br/>
+            <a href="/bugs/working" rel="working">Working</a><br/>
+            <a href="/bugs/qa" rel="qa">In QA</a><br/>
+            <a href="/bugs/done" rel="done">Done</a>
+        </div>
+    </body>
+</html>

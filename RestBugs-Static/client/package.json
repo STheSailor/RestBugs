@@ -1,0 +1,16 @@
+{
+  "name": "RestBugsClient",
+  "version": "0.0.1",
+  "description": "A simple console appliation which can process RestBugs JSON representations",
+  "main": "restbugs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^2.2.0",
+    "async": "^0.6.2",
+    "underscore": "^1.6.0"
+  }
+}
